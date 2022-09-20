@@ -3,11 +3,14 @@ package com.cosine.punishment.manager
 import com.cosine.punishment.service.InstanceService
 import com.cosine.punishment.service.PunishService
 import com.cosine.punishment.util.getName
+import com.cosine.punishment.util.getPlayer
 import com.cosine.punishment.util.isInt
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.collections.List
+import kotlin.math.max
 
 class PunishManager(private val instance: InstanceService) : PunishService {
 
@@ -16,10 +19,12 @@ class PunishManager(private val instance: InstanceService) : PunishService {
 
     private val time = instance.timeManager
     private val message = instance.messageManager
+    private val punish = instance.punishManager
 
     override fun addWarning(target: UUID, code: Int) {
         val targetWarning = playerConfig.getInt("$target.경고")
         val codeWarning = optionConfig.getInt("처벌.$code.경고")
+
         playerConfig.set("$target.경고", (targetWarning + codeWarning))
         instance.playerFile.saveConfig()
     }
@@ -55,6 +60,8 @@ class PunishManager(private val instance: InstanceService) : PunishService {
         playerConfig.set("$target.처리자", player.name)
         playerConfig.set("$target.밴", targetBan)
         instance.playerFile.saveConfig()
+
+        banPlayerWithWarning(target)
     }
 
     override fun subtractWarning(target: UUID, warning: Int) {
@@ -103,6 +110,20 @@ class PunishManager(private val instance: InstanceService) : PunishService {
             }
         }
         return codeList
+    }
+
+    override fun banPlayerWithWarning(target: UUID) {
+        val targetWarning = playerConfig.getInt("$target.경고")
+        val maxWarning = optionConfig.getInt("설정.최대경고")
+        if (targetWarning >= maxWarning) {
+            if (Bukkit.getPlayer(target) != null) {
+                getPlayer(target).kickPlayer(punish.maxWarningBanScreenMessage(target))
+            }
+        } else {
+            if (Bukkit.getPlayer(target) != null) {
+                getPlayer(target).kickPlayer(punish.defaultBanScreenMessage(target))
+            }
+        }
     }
 
 }
