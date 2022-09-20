@@ -8,9 +8,12 @@ import com.cosine.punishment.util.CustomConfig
 interface InstanceService {
 
     var optionFile: CustomConfig
+
     var playerFile: CustomConfig
 
     val messageManager: MessageManager
+
     val timeManager: TimeManager
+
     val punishManager: PunishManager
 }
