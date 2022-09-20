@@ -18,3 +18,4 @@ fun isInt(str: String): Boolean {
 }
 
 fun getName(uuid: UUID): String = Bukkit.getOfflinePlayer(uuid).name
+fun applyColor(message: String): String = message.replace("&", "§")

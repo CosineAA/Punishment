@@ -2,16 +2,17 @@ package com.cosine.punishment.manager
 
 import com.cosine.punishment.service.InstanceService
 import com.cosine.punishment.service.MessageService
+import com.cosine.punishment.util.applyColor
 
 class MessageManager(instance: InstanceService) : MessageService {
 
     private val optionConfig = instance.optionFile.getConfig()
 
-    private val checkWarningMessage by lazy { optionConfig.getString("메시지.경고확인") }
-    private val minusWarningMessage by lazy { optionConfig.getString("메시지.경고차감") }
-    private val clearMuteMessage by lazy { optionConfig.getString("메시지.뮤트해제") }
-    private val clearBanMessage by lazy { optionConfig.getString("메시지.차단해제") }
-    private val muteMessage by lazy { optionConfig.getString("메시지.뮤트") }
+    private val checkWarningMessage by lazy { applyColor(optionConfig.getString("메시지.경고확인")) }
+    private val minusWarningMessage by lazy { applyColor(optionConfig.getString("메시지.경고차감")) }
+    private val clearMuteMessage by lazy { applyColor(optionConfig.getString("메시지.뮤트해제")) }
+    private val clearBanMessage by lazy { applyColor(optionConfig.getString("메시지.차단해제")) }
+    private val muteMessage by lazy { applyColor(optionConfig.getString("메시지.뮤트")) }
 
     private val punishMessage by lazy { optionConfig.getStringList("메시지.처벌") }
     private val defaultBanMessage by lazy { optionConfig.getStringList("메시지.일반밴") }
@@ -40,6 +41,7 @@ class MessageManager(instance: InstanceService) : MessageService {
     ): List<String> {
         val message = punishMessage
         for(value: String in message) {
+            applyColor(value)
             value.replace("%target%", targetReplace)
             value.replace("%manager%", managerReplace)
             value.replace("%punish%", punishReplace)
@@ -59,6 +61,7 @@ class MessageManager(instance: InstanceService) : MessageService {
     ): String {
         val messageList = defaultBanMessage
         for (value: String in messageList) {
+            applyColor(value)
             value.replace("%reason%", reasonReplace)
             value.replace("%manager%", managerReplace)
             value.replace("%target%", targetReplace)
@@ -76,6 +79,7 @@ class MessageManager(instance: InstanceService) : MessageService {
     override fun maxWarningBanMessageReplacer(warningReplace: String, targetReplace: String): String {
         val messageList = maxWarningMessage
         for (value: String in messageList) {
+            applyColor(value)
             value.replace("%max%", warningReplace)
             value.replace("%target%", targetReplace)
         }
@@ -101,6 +105,7 @@ class MessageManager(instance: InstanceService) : MessageService {
 
         val message = punishListMessage
         for(value: String in message) {
+            applyColor(value)
             value.replace("%reason%", reasonReplace)
             value.replace("%code%", code.toString())
             value.replace("%warning%", warningReplace)

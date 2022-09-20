@@ -1,6 +1,7 @@
 package com.cosine.punishment.command
 
 import com.cosine.punishment.service.InstanceService
+import com.cosine.punishment.util.applyColor
 import com.cosine.punishment.util.getName
 import com.cosine.punishment.util.isInt
 import com.cosine.punishment.util.sendMessages
@@ -21,7 +22,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
     private val message = instance.messageManager
     private val punish = instance.punishManager
 
-    private val prefix by lazy { optionConfig.getString("메시지.접두사") }
+    private val prefix by lazy { applyColor(optionConfig.getString("메시지.접두사")) }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (sender is Player) {
@@ -35,16 +36,16 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                 "제재" -> {
                     sameFunction(player, args)
                     if (args.size == 2) {
-                        player.sendMessage("$prefix 코드를 적어주세요.")
+                        player.sendMessage("$prefix§f 코드를 적어주세요.")
                         return false
                     }
                     if (!isInt(args[2])) {
-                        player.sendMessage("$prefix 숫자가 아닙니다.")
+                        player.sendMessage("$prefix§f 숫자가 아닙니다.")
                         return false
                     }
                     val code = args[2].toInt()
                     if (!optionConfig.contains("처벌.$code")) {
-                        player.sendMessage("$prefix 존재하지 않는 코드입니다.")
+                        player.sendMessage("$prefix§f 존재하지 않는 코드입니다.")
                         return false
                     }
                     getOfflinePlayer(args[1]) { punishmentSanctions(player, it.uniqueId, code) }
@@ -52,11 +53,11 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                 "경고차감" -> {
                     sameFunction(player, args)
                     if (args.size == 2) {
-                        player.sendMessage("$prefix 횟수를 적어주세요.")
+                        player.sendMessage("$prefix§f 횟수를 적어주세요.")
                         return false
                     }
                     if (!isInt(args[2])) {
-                        player.sendMessage("$prefix 숫자가 아닙니다.")
+                        player.sendMessage("$prefix§f 숫자가 아닙니다.")
                         return false
                     }
                     val warning = args[2].toInt()
@@ -69,7 +70,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                 "뮤트해제" -> {
                     sameFunction(player, args)
                     if (!playerConfig.contains("${player.uniqueId}.뮤트")) {
-                        player.sendMessage("$prefix 해당 플레이어에게 적용된 뮤트가 없습니다.")
+                        player.sendMessage("$prefix§f 해당 플레이어에게 적용된 뮤트가 없습니다.")
                         return false
                     }
                     getOfflinePlayer(args[1]) { clearPlayerMute(player, it.uniqueId) }
@@ -77,14 +78,14 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                 "차단해제" -> {
                     sameFunction(player, args)
                     if (!playerConfig.contains("${player.uniqueId}.밴")) {
-                        player.sendMessage("$prefix 해당 플레이어에게 적용된 밴이 없습니다.")
+                        player.sendMessage("$prefix§f 해당 플레이어에게 적용된 밴이 없습니다.")
                         return false
                     }
                     getOfflinePlayer(args[1]) { clearPlayerBan(player, it.uniqueId) }
                 }
                 "검색" -> {
                     if (args.size == 1) {
-                        player.sendMessage("$prefix 단어를 입력해주세요.")
+                        player.sendMessage("$prefix§f 단어를 입력해주세요.")
                         return false
                     }
                     searchPunish(player, args[1])
@@ -93,7 +94,10 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                     if (!player.isOp) return false
                     instance.optionFile.reloadConfig()
                     instance.playerFile.reloadConfig()
-                    player.sendMessage("$prefix 플러그인이 리로드 되었습니다.")
+                    player.sendMessage("$prefix§f 플러그인이 리로드 되었습니다.")
+                }
+                "코사인" -> {
+                    player.sendMessage("§fMade by Cosine_A")
                 }
             }
         }
@@ -101,14 +105,14 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
     }
     private fun help(player: Player) {
         player.sendMessages(
-            "$prefix 처벌 시스템 도움말",
+            "$prefix §f§l처벌 시스템 도움말",
             "",
-            "$prefix /처벌 제재 [닉네임] [코드]",
-            "$prefix /처벌 경고차감 [닉네임] [횟수]",
-            "$prefix /처벌 경고확인 [닉네임]",
-            "$prefix /처벌 뮤트해제 [닉네임]",
-            "$prefix /처벌 차단해제 [닉네임]",
-            "$prefix /처벌 검색 [단어]"
+            "$prefix §f/처벌 제재 [닉네임] [코드]",
+            "$prefix §f/처벌 경고차감 [닉네임] [횟수]",
+            "$prefix §f/처벌 경고확인 [닉네임]",
+            "$prefix §f/처벌 뮤트해제 [닉네임]",
+            "$prefix §f/처벌 차단해제 [닉네임]",
+            "$prefix §f/처벌 검색 [단어]"
         )
         if (player.isOp) "$prefix /처벌 리로드"
     }

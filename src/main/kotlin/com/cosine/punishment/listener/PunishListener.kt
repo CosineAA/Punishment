@@ -1,6 +1,7 @@
 package com.cosine.punishment.listener
 
 import com.cosine.punishment.service.InstanceService
+import com.cosine.punishment.util.applyColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -16,7 +17,7 @@ class PunishListener(private val instance: InstanceService) : Listener {
     private val time = instance.timeManager
     private val punish = instance.punishManager
 
-    private val prefix by lazy { optionConfig.getString("메시지.접두사") }
+    private val prefix by lazy { applyColor(optionConfig.getString("메시지.접두사")) }
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
