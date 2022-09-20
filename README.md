@@ -1,6 +1,9 @@
-처벌 플러그인
-=
-> Koooooooooooootiln 좋아요
+# 처벌 플러그인
+> Koooooooooooootiln
+> 
+> 코드가 간결해서
+> 
+> 좋아요
 ---
 
 ### 기능
