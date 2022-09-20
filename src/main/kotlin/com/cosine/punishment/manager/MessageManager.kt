@@ -67,13 +67,7 @@ class MessageManager(instance: InstanceService) : MessageService {
             value.replace("%target%", targetReplace)
             value.replace("%time%", timeReplace)
         }
-        val message = messageList.toString()
-        message.apply {
-            replace("[", "")
-            replace("]", "")
-            replace(", ", "\n")
-        }
-        return message
+        return messageList.joinToString("\n")
     }
 
     override fun maxWarningBanMessageReplacer(warningReplace: String, targetReplace: String): String {
@@ -83,13 +77,7 @@ class MessageManager(instance: InstanceService) : MessageService {
             value.replace("%max%", warningReplace)
             value.replace("%target%", targetReplace)
         }
-        val message = messageList.toString()
-        message.apply {
-            replace("[", "")
-            replace("]", "")
-            replace(", ", "\n")
-        }
-        return message
+        return messageList.joinToString("\n")
     }
 
     override fun checkWarningReplacer(targetReplace: String, warningReplace: String): String {
