@@ -5,6 +5,7 @@ import com.cosine.punishment.util.getName
 import com.cosine.punishment.util.isInt
 import com.cosine.punishment.util.sendMessages
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -32,7 +33,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
             when (args[0]) {
                 "제재" -> {
                     sameFunction(player, args)
-                    val target = Bukkit.getOfflinePlayer(args[1])
+                    val target = getOfflinePlayer(args[1])!!
                     if (args.size == 2) {
                         player.sendMessage("$prefix 코드를 적어주세요.")
                         return false
@@ -50,7 +51,6 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                 }
                 "경고차감" -> {
                     sameFunction(player, args)
-                    val target = Bukkit.getOfflinePlayer(args[1])
                     if (args.size == 2) {
                         player.sendMessage("$prefix 횟수를 적어주세요.")
                         return false
@@ -60,25 +60,27 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                         return false
                     }
                     val warning = args[2].toInt()
+                    val target = getOfflinePlayer(args[1])!!
                     subtractWarning(player, target.uniqueId, warning)
                 }
                 "경고확인" -> {
                     sameFunction(player, args)
-                    val target = Bukkit.getOfflinePlayer(args[1])
+                    val target = getOfflinePlayer(args[1])!!
                     checkPlayerWarning(player, target.uniqueId)
                 }
                 "뮤트해제" -> {
                     sameFunction(player, args)
-                    val target = Bukkit.getOfflinePlayer(args[1])
+                    val target = getOfflinePlayer(args[1])!!
                     if (!playerConfig.contains("${player.uniqueId}.뮤트")) {
                         player.sendMessage("$prefix 해당 플레이어에게 적용된 뮤트가 없습니다.")
                         return false
                     }
+
                     clearPlayerMute(player, target.uniqueId)
                 }
                 "차단해제" -> {
                     sameFunction(player, args)
-                    val target = Bukkit.getOfflinePlayer(args[1])
+                    val target = getOfflinePlayer(args[1])!!
                     if (!playerConfig.contains("${player.uniqueId}.밴")) {
                         player.sendMessage("$prefix 해당 플레이어에게 적용된 밴이 없습니다.")
                         return false
@@ -115,14 +117,21 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
         )
         if (player.isOp) "$prefix /처벌 리로드"
     }
+    private fun getOfflinePlayer(name: String): OfflinePlayer? {
+        var offlinePlayer: OfflinePlayer? = null
+        Bukkit.getScheduler().runTaskAsynchronously(instance.plugin) {
+            offlinePlayer = Bukkit.getOfflinePlayer(name)
+        }
+        return offlinePlayer
+    }
     private fun sameFunction(player: Player, args: Array<out String>) {
         if (args.size == 1) {
             player.sendMessage("$prefix 닉네임을 적어주세요.")
             return
         }
-        val target = Bukkit.getOfflinePlayer(args[1]) ?: run {
+        val target = getOfflinePlayer(args[1]) ?: run {
             player.sendMessage("$prefix 존재하지 않는 유저입니다.")
-            return@sameFunction
+            return
         }
         if (!target.hasPlayedBefore()) {
             player.sendMessage("$prefix 존재하지 않는 유저입니다.")

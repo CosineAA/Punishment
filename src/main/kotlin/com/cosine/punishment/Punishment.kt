@@ -11,12 +11,18 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class Punishment : JavaPlugin(), InstanceService {
 
+    override lateinit var plugin: Punishment
+
     override lateinit var optionFile: CustomConfig
     override lateinit var playerFile: CustomConfig
 
     override val messageManager: MessageManager by lazy { MessageManager(this) }
     override val timeManager: TimeManager by lazy { TimeManager() }
     override val punishManager: PunishManager by lazy { PunishManager(this) }
+
+    override fun onLoad() {
+        plugin = this
+    }
 
     override fun onEnable() {
         logger.info("처벌 플러그인 활성화")
