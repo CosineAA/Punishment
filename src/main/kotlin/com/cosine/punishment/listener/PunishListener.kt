@@ -1,8 +1,6 @@
 package com.cosine.punishment.listener
 
 import com.cosine.punishment.service.InstanceService
-import com.cosine.punishment.util.getOfflinePlayer
-import com.cosine.punishment.util.getPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -35,7 +33,7 @@ class PunishListener(private val instance: InstanceService) : Listener {
         if (!playerConfig.contains("${player.uniqueId}.뮤트")) return
         val playerMute = playerConfig.getString("${player.uniqueId}.뮤트")
         if (time.isTimeAfter(playerMute)) {
-            punish.clearPlayerMute(player)
+            punish.clearPlayerMute(player.uniqueId)
             return
         }
         event.isCancelled = true
@@ -49,14 +47,16 @@ class PunishListener(private val instance: InstanceService) : Listener {
         val playerWarning = playerConfig.getInt("$uuid.경고")
         val maxWarning = optionConfig.getInt("설정.최대경고")
 
+        // 누적밴
         if (playerWarning >= maxWarning) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, punish.maxWarningBanScreenMessage(uuid))
             return
         }
+        // 일반밴
         if (playerConfig.contains("$uuid.밴")) {
             val playerBan = playerConfig.getString("$uuid.밴")
             if (time.isTimeAfter(playerBan)) {
-                punish.clearPlayerBan(getOfflinePlayer(uuid))
+                punish.clearPlayerBan(uuid)
                 return
             }
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, punish.defaultBanScreenMessage(uuid))

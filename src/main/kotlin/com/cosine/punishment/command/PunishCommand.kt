@@ -1,14 +1,15 @@
 package com.cosine.punishment.command
 
 import com.cosine.punishment.service.InstanceService
+import com.cosine.punishment.util.getName
 import com.cosine.punishment.util.isInt
 import com.cosine.punishment.util.sendMessages
 import org.bukkit.Bukkit
-import org.bukkit.OfflinePlayer
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.UUID
 
 class PunishCommand(private val instance: InstanceService) : CommandExecutor {
 
@@ -16,7 +17,6 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
     private val playerConfig = instance.playerFile.getConfig()
 
     private val message = instance.messageManager
-    private val time = instance.timeManager
     private val punish = instance.punishManager
 
     private val prefix by lazy { optionConfig.getString("메시지.접두사") }
@@ -46,7 +46,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                         player.sendMessage("$prefix 존재하지 않는 코드입니다.")
                         return false
                     }
-                    punishmentSanctions(player, target, code)
+                    punishmentSanctions(player, target.uniqueId, code)
                 }
                 "경고차감" -> {
                     sameFunction(player, args)
@@ -60,7 +60,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                         return false
                     }
                     val warning = args[2].toInt()
-                    subtractWarning(player, target, warning)
+                    subtractWarning(player, target.uniqueId, warning)
                 }
                 "뮤트해제" -> {
                     sameFunction(player, args)
@@ -69,7 +69,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                         player.sendMessage("$prefix 해당 플레이어에게 적용된 뮤트가 없습니다.")
                         return false
                     }
-                    clearPlayerMute(player, target)
+                    clearPlayerMute(player, target.uniqueId)
                 }
                 "차단해제" -> {
                     sameFunction(player, args)
@@ -78,7 +78,13 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                         player.sendMessage("$prefix 해당 플레이어에게 적용된 밴이 없습니다.")
                         return false
                     }
-                    clearPlayerBan(player, target)
+                    clearPlayerBan(player, target.uniqueId)
+                }
+                "리로드" -> {
+                    if (!player.isOp) return false
+                    instance.optionFile.reloadConfig()
+                    instance.playerFile.reloadConfig()
+                    player.sendMessage("$prefix 플러그인이 리로드 되었습니다.")
                 }
             }
         }
@@ -93,6 +99,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
             "$prefix /처벌 뮤트해제 [닉네임]",
             "$prefix /처벌 차단해제 [닉네임]"
         )
+        if (player.isOp) "$prefix /처벌 리로드"
     }
     private fun sameFunction(player: Player, args: Array<out String>) {
         if (args.size == 1) {
@@ -108,25 +115,25 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
             return
         }
     }
-    private fun punishmentSanctions(player: Player, target: OfflinePlayer, code: Int) {
+    private fun punishmentSanctions(player: Player, target: UUID, code: Int) {
         val punishName = optionConfig.getString("처벌.$code.이름")
 
         punish.addWarning(target, code)
         punish.applyMute(target, code)
         punish.applyBan(player, target, code)
 
-        message.punishMessageReplacer(target.name, player.name, punishName)
+        message.punishMessageReplacer(getName(target), player.name, punishName)
     }
-    private fun subtractWarning(player: Player, target: OfflinePlayer, warning: Int) {
+    private fun subtractWarning(player: Player, target: UUID, warning: Int) {
         punish.subtractWarning(target, warning)
-        player.sendMessage("$prefix ${message.minusWarningReplacer(target.name, warning.toString())}")
+        player.sendMessage("$prefix ${message.minusWarningReplacer(getName(target), warning.toString())}")
     }
-    private fun clearPlayerMute(player: Player, target: OfflinePlayer) {
+    private fun clearPlayerMute(player: Player, target: UUID) {
         punish.clearPlayerMute(target)
-        player.sendMessage("$prefix ${message.clearMuteReplacer(target.name)}")
+        player.sendMessage("$prefix ${message.clearMuteReplacer(getName(target))}")
     }
-    private fun clearPlayerBan(player: Player, target: OfflinePlayer) {
+    private fun clearPlayerBan(player: Player, target: UUID) {
         punish.clearPlayerMute(target)
-        player.sendMessage("$prefix ${message.clearBanReplacer(target.name)}")
+        player.sendMessage("$prefix ${message.clearBanReplacer(getName(target))}")
     }
 }
