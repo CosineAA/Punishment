@@ -89,8 +89,8 @@ class PunishManager(private val instance: InstanceService) : PunishService {
     override fun defaultBanScreenMessage(target: UUID): String {
         val reason = playerConfig.getString("$target.사유")
         val manager = playerConfig.getString("$target.처리자")
-        val time = playerConfig.getString("$target.밴")
-        return message.defaultBanMessageReplacer(reason, manager, getName(target), time)
+        val banTime = playerConfig.getString("$target.밴")
+        return message.defaultBanMessageReplacer(reason, manager, getName(target), time.getKoreanFromTime(banTime))
     }
 
     override fun maxWarningBanScreenMessage(target: UUID): String {
