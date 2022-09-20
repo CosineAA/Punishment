@@ -15,4 +15,6 @@ interface PunishService {
     
     fun defaultBanScreenMessage(target: UUID): String
     fun maxWarningBanScreenMessage(target: UUID): String
+
+    fun getWordInReasonList(word: String): List<Int>
 }

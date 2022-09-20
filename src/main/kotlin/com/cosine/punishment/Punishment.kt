@@ -1,4 +1,4 @@
-package com.cosine.punishment.main
+package com.cosine.punishment
 
 import com.cosine.punishment.command.PunishCommand
 import com.cosine.punishment.listener.PunishListener

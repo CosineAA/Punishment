@@ -9,7 +9,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
 
 class PunishCommand(private val instance: InstanceService) : CommandExecutor {
 
@@ -62,6 +62,11 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                     val warning = args[2].toInt()
                     subtractWarning(player, target.uniqueId, warning)
                 }
+                "경고확인" -> {
+                    sameFunction(player, args)
+                    val target = Bukkit.getOfflinePlayer(args[1])
+                    checkPlayerWarning(player, target.uniqueId)
+                }
                 "뮤트해제" -> {
                     sameFunction(player, args)
                     val target = Bukkit.getOfflinePlayer(args[1])
@@ -80,6 +85,13 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
                     }
                     clearPlayerBan(player, target.uniqueId)
                 }
+                "검색" -> {
+                    if (args.size == 1) {
+                        player.sendMessage("$prefix 단어를 입력해주세요.")
+                        return false
+                    }
+                    searchPunish(player, args[1])
+                }
                 "리로드" -> {
                     if (!player.isOp) return false
                     instance.optionFile.reloadConfig()
@@ -96,8 +108,10 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
             "",
             "$prefix /처벌 제재 [닉네임] [코드]",
             "$prefix /처벌 경고차감 [닉네임] [횟수]",
+            "$prefix /처벌 경고확인 [닉네임]",
             "$prefix /처벌 뮤트해제 [닉네임]",
-            "$prefix /처벌 차단해제 [닉네임]"
+            "$prefix /처벌 차단해제 [닉네임]",
+            "$prefix /처벌 검색 [단어]"
         )
         if (player.isOp) "$prefix /처벌 리로드"
     }
@@ -135,5 +149,21 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
     private fun clearPlayerBan(player: Player, target: UUID) {
         punish.clearPlayerMute(target)
         player.sendMessage("$prefix ${message.clearBanReplacer(getName(target))}")
+    }
+    private fun checkPlayerWarning(player: Player, target: UUID) {
+        val targetWarning = playerConfig.getInt("$target.경고")
+        player.sendMessage("$prefix ${message.checkWarningReplacer(getName(target), targetWarning.toString())}")
+    }
+    private fun searchPunish(player: Player, word: String) {
+        val codeList = punish.getWordInReasonList(word)
+        if (codeList.isEmpty()) {
+            player.sendMessage("$prefix 해당 단어을 포함한 처벌이 존재하지 않습니다.")
+            return
+        }
+        codeList.forEach { code ->
+            message.checkPunishListReplacer(code).forEach { info ->
+                player.sendMessage("$prefix $info")
+            }
+        }
     }
 }

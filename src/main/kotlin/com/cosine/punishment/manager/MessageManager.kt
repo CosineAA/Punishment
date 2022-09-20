@@ -5,14 +5,18 @@ import com.cosine.punishment.service.MessageService
 
 class MessageManager(instance: InstanceService) : MessageService {
 
-    private val minusWarningMessage = instance.optionFile.getConfig().getString("메시지.경고차감")
-    private val clearMuteMessage = instance.optionFile.getConfig().getString("메시지.뮤트해제")
-    private val clearBanMessage = instance.optionFile.getConfig().getString("메시지.차단해제")
-    private val muteMessage = instance.optionFile.getConfig().getString("메시지.뮤트")
+    private val optionConfig = instance.optionFile.getConfig()
 
-    private val punishMessage = instance.optionFile.getConfig().getStringList("메시지.처벌")
-    private val defaultBanMessage = instance.optionFile.getConfig().getStringList("메시지.일반밴")
-    private val maxWarningMessage = instance.optionFile.getConfig().getStringList("메시지.누적밴")
+    private val checkWarningMessage by lazy { optionConfig.getString("메시지.경고확인") }
+    private val minusWarningMessage by lazy { optionConfig.getString("메시지.경고차감") }
+    private val clearMuteMessage by lazy { optionConfig.getString("메시지.뮤트해제") }
+    private val clearBanMessage by lazy { optionConfig.getString("메시지.차단해제") }
+    private val muteMessage by lazy { optionConfig.getString("메시지.뮤트") }
+
+    private val punishMessage by lazy { optionConfig.getStringList("메시지.처벌") }
+    private val defaultBanMessage by lazy { optionConfig.getStringList("메시지.일반밴") }
+    private val maxWarningMessage by lazy { optionConfig.getStringList("메시지.누적밴") }
+    private val punishListMessage by lazy { optionConfig.getStringList("메시지.처벌목록") }
 
     override fun minusWarningReplacer(targetReplace: String, warningReplace: String): String {
         return minusWarningMessage.apply {
@@ -84,4 +88,34 @@ class MessageManager(instance: InstanceService) : MessageService {
         return message
     }
 
+    override fun checkWarningReplacer(targetReplace: String, warningReplace: String): String {
+        return checkWarningMessage.replace("%target%", targetReplace).replace("%warning%", warningReplace)
+    }
+
+    override fun checkPunishListReplacer(code: Int): List<String> {
+        val reasonReplace = optionConfig.getString("처벌.$code.사유")
+        val warningReplace = optionConfig.getString("처벌.$code.경고")
+
+        val muteReplace = replaceTimeToString(code, "뮤트")
+        val banReplace = replaceTimeToString(code, "밴")
+
+        val message = punishListMessage
+        for(value: String in message) {
+            value.replace("%reason%", reasonReplace)
+            value.replace("%code%", code.toString())
+            value.replace("%warning%", warningReplace)
+            value.replace("%mute%", muteReplace)
+            value.replace("%ban%", banReplace)
+        }
+        return message
+    }
+
+    private fun replaceTimeToString(code: Int, select: String): String {
+        return if (optionConfig.contains("처벌.$code.$select")) {
+            val time = optionConfig.getString("처벌.$code.$select").split(",")
+            "${time[0]}일 ${time[1]}시 ${time[2]}분"
+        } else {
+            "X"
+        }
+    }
 }

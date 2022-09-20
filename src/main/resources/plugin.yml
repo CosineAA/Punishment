@@ -1,6 +1,6 @@
 name: Punishment
 version: '${version}'
-main: com.cosine.punishment.main.Punishment
+main: com.cosine.punishment.Punishment
 authors: [ Cosine_A ]
 description: 처벌 플러그인
 

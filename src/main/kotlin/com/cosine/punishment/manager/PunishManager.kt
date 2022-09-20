@@ -3,9 +3,11 @@ package com.cosine.punishment.manager
 import com.cosine.punishment.service.InstanceService
 import com.cosine.punishment.service.PunishService
 import com.cosine.punishment.util.getName
+import com.cosine.punishment.util.isInt
 import org.bukkit.entity.Player
 import java.time.ZonedDateTime
 import java.util.*
+import kotlin.collections.List
 
 class PunishManager(private val instance: InstanceService) : PunishService {
 
@@ -87,6 +89,20 @@ class PunishManager(private val instance: InstanceService) : PunishService {
     override fun maxWarningBanScreenMessage(target: UUID): String {
         val maxWarning = optionConfig.getInt("설정.최대경고")
         return message.maxWarningBanMessageReplacer(maxWarning.toString(), getName(target))
+    }
+
+    override fun getWordInReasonList(word: String): List<Int> {
+        val codeList = mutableListOf<Int>()
+        for(code: String in optionConfig.getConfigurationSection("처벌").getKeys(false)) {
+            if (code.contains("예시코드")) continue
+            val reason = optionConfig.getString("처벌.$code.사유")
+            if (isInt(code) && reason.contains(word)) {
+                codeList.add(code.toInt())
+            } else {
+                continue
+            }
+        }
+        return codeList
     }
 
 }
