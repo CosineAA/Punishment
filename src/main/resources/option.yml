@@ -1,8 +1,11 @@
 # 경고차감 | %target% = 대상자 , %warning% = 차감 경고 횟수
 # 뮤트해제 | %target% = 대상자
 # 차단해제 | %target% = 대상자
-# 처벌 | %target% = 대상자 , %manager% = 담당자 , %punish% = 항목
+# 처벌 | %target% = 대상자 , %manager% = 처리자 , %punish% = 항목
 # 뮤트 | %time% = 시간
+# 일반밴 | %reason% = 사유 , %manager% = 처리자 , %target% = 대상자 , %time% = 시간
+# 누적밴 | %max% = 최대 경고 , %target% = 대상자
+# 처벌목록 | %reason% = 사유 , %code% = 코드 , %warning% = 경고수 , %mute% = 뮤트시간 , %ban% = 밴시간
 
 메시지:
   접두사: "&f&l[ &c&l처벌 &f&l]&f"
@@ -31,7 +34,7 @@
   누적밴:
   - "서버에서 밴 되었습니다."
   - ""
-  - "[ 사유 ] %warning%회 누적"
+  - "[ 사유 ] %max%회 누적"
   - "[ 처리자 ] Console"
   - "[ 대상자 ] %target%"
   - "[ 해제 날짜 ] 무기한"
