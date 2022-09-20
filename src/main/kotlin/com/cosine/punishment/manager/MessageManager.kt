@@ -70,7 +70,18 @@ class MessageManager(instance: InstanceService) : MessageService {
     }
 
     override fun maxWarningBanMessageReplacer(warningReplace: String, targetReplace: String): String {
-
+        val messageList = defaultBanMessage
+        for (value: String in messageList) {
+            value.replace("%warning%", warningReplace)
+            value.replace("%target%", targetReplace)
+        }
+        val message = messageList.toString()
+        message.apply {
+            replace("[", "")
+            replace("]", "")
+            replace(", ", "\n")
+        }
+        return message
     }
 
 }

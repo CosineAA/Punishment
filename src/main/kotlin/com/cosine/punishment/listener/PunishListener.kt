@@ -1,6 +1,8 @@
 package com.cosine.punishment.listener
 
 import com.cosine.punishment.service.InstanceService
+import com.cosine.punishment.util.getOfflinePlayer
+import com.cosine.punishment.util.getPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -32,24 +34,32 @@ class PunishListener(private val instance: InstanceService) : Listener {
         val player = event.player
         if (!playerConfig.contains("${player.uniqueId}.뮤트")) return
         val playerMute = playerConfig.getString("${player.uniqueId}.뮤트")
-        if (!time.isTimeAfter(playerMute)) {
-            event.isCancelled = true
-            player.sendMessage("$prefix ${message.muteMessageReplacer(time.getKoreanFromTime(playerMute))}")
+        if (time.isTimeAfter(playerMute)) {
+            punish.clearPlayerMute(player)
             return
         }
-        punish.clearPlayerMute(player)
+        event.isCancelled = true
+        player.sendMessage("$prefix ${message.muteMessageReplacer(time.getKoreanFromTime(playerMute))}")
     }
 
     @EventHandler
     fun onPreJoin(event: AsyncPlayerPreLoginEvent) {
         val uuid = event.uniqueId
-        val name = event.playerProfile.name
 
         val playerWarning = playerConfig.getInt("$uuid.경고")
         val maxWarning = optionConfig.getInt("설정.최대경고")
 
         if (playerWarning >= maxWarning) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, punish.maxWarningBanScreenMessage(uuid))
+            return
+        }
+        if (playerConfig.contains("$uuid.밴")) {
+            val playerBan = playerConfig.getString("$uuid.밴")
+            if (time.isTimeAfter(playerBan)) {
+                punish.clearPlayerBan(getOfflinePlayer(uuid))
+                return
+            }
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, punish.defaultBanScreenMessage(uuid))
         }
     }
 }
