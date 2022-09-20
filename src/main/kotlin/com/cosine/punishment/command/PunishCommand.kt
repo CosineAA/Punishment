@@ -124,16 +124,16 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
     }
     private fun sameFunction(player: Player, args: Array<out String>) {
         if (args.size == 1) {
-            player.sendMessage("$prefix 닉네임을 적어주세요.")
+            player.sendMessage("$prefix§f 닉네임을 적어주세요.")
             return
         }
         getOfflinePlayer(args[1]) {
             val target = it ?: run {
-                player.sendMessage("$prefix 존재하지 않는 유저입니다.")
+                player.sendMessage("$prefix§f 존재하지 않는 유저입니다.")
                 return@getOfflinePlayer
             }
             if (!target.hasPlayedBefore()) {
-                player.sendMessage("$prefix 존재하지 않는 유저입니다.")
+                player.sendMessage("$prefix§f 존재하지 않는 유저입니다.")
                 return@getOfflinePlayer
             }
         }
@@ -166,7 +166,7 @@ class PunishCommand(private val instance: InstanceService) : CommandExecutor {
     private fun searchPunish(player: Player, word: String) {
         val codeList = punish.getWordInReasonList(word)
         if (codeList.isEmpty()) {
-            player.sendMessage("$prefix 해당 단어을 포함한 처벌이 존재하지 않습니다.")
+            player.sendMessage("$prefix§f 해당 단어를 포함한 처벌이 존재하지 않습니다.")
             return
         }
         codeList.forEach { code ->
