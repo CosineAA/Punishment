@@ -1,7 +1,9 @@
 package com.cosine.punishment.main
 
 import com.cosine.punishment.command.PunishCommand
+import com.cosine.punishment.listener.PunishListener
 import com.cosine.punishment.manager.MessageManager
+import com.cosine.punishment.manager.PunishManager
 import com.cosine.punishment.manager.TimeManager
 import com.cosine.punishment.service.InstanceService
 import com.cosine.punishment.util.CustomConfig
@@ -14,6 +16,7 @@ class Punishment : JavaPlugin(), InstanceService {
 
     override val messageManager: MessageManager by lazy { MessageManager(this) }
     override val timeManager: TimeManager by lazy { TimeManager() }
+    override val punishManager: PunishManager by lazy { PunishManager(this) }
 
     override fun onEnable() {
         logger.info("처벌 플러그인 활성화")
@@ -28,6 +31,7 @@ class Punishment : JavaPlugin(), InstanceService {
         playerFile.loadConfig()
 
         getCommand("처벌").executor = PunishCommand(this)
+        server.pluginManager.registerEvents(PunishListener(this), this)
     }
 
     override fun onDisable() {

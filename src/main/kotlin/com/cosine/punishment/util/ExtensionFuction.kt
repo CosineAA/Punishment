@@ -16,3 +16,5 @@ fun isInt(str: String): Boolean {
         false
     }
 }
+
+fun getName(uuid: UUID) = Bukkit.getOfflinePlayer(uuid).name

@@ -10,4 +10,18 @@ interface MessageService {
         managerReplace: String,
         punishReplace: String
     ): List<String>
+
+    fun muteMessageReplacer(timeReplace: String): String
+
+    fun defaultBanMessageReplacer(
+        reasonReplace: String,
+        managerReplace: String,
+        targetReplace: String,
+        timeReplace: String
+    ): String
+
+    fun maxWarningBanMessageReplacer(
+        warningReplace: String,
+        targetReplace: String,
+    ): String
 }
