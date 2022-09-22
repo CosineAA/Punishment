@@ -10,9 +10,9 @@ interface InstanceService {
 
     val plugin: Punishment
 
-    var optionFile: CustomConfig
+    val optionFile: CustomConfig
 
-    var playerFile: CustomConfig
+    val playerFile: CustomConfig
 
     val messageManager: MessageManager
 

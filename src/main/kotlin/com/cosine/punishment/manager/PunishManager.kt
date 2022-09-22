@@ -19,7 +19,6 @@ class PunishManager(private val instance: InstanceService) : PunishService {
 
     private val time = instance.timeManager
     private val message = instance.messageManager
-    private val punish = instance.punishManager
 
     override fun addWarning(target: UUID, code: Int) {
         val targetWarning = playerConfig.getInt("$target.경고")
@@ -117,11 +116,11 @@ class PunishManager(private val instance: InstanceService) : PunishService {
         val maxWarning = optionConfig.getInt("설정.최대경고")
         if (targetWarning >= maxWarning) {
             if (Bukkit.getPlayer(target) != null) {
-                getPlayer(target).kickPlayer(punish.maxWarningBanScreenMessage(target))
+                getPlayer(target).kickPlayer(maxWarningBanScreenMessage(target))
             }
         } else {
             if (Bukkit.getPlayer(target) != null) {
-                getPlayer(target).kickPlayer(punish.defaultBanScreenMessage(target))
+                getPlayer(target).kickPlayer(defaultBanScreenMessage(target))
             }
         }
     }
